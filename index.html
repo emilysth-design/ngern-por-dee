@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="th">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f6f7f2" />
+    <meta
+      name="description"
+      content="เงินพอดี แอปจัดสรรรายจ่ายส่วนตัว ดูงบและบันทึกรายจ่ายได้ง่าย ๆ"
+    />
+    <title>เงินพอดี — จัดการเงินให้อยู่มือ</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Prompt:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <a class="brand" href="#" aria-label="เงินพอดี หน้าภาพรวม">
+          <span class="brand-mark" aria-hidden="true">฿</span>
+          <span>เงิน<span class="brand-accent">พอดี</span></span>
+        </a>
+        <button class="avatar" type="button" aria-label="โปรไฟล์">ม</button>
+      </header>
+
+      <main>
+        <section class="welcome-row" aria-labelledby="welcome-title">
+          <div>
+            <p class="eyebrow" id="month-label">ภาพรวมประจำเดือน</p>
+            <h1 id="welcome-title">สวัสดี, วันนี้เป็นไงบ้าง?</h1>
+          </div>
+          <button class="month-picker" id="month-picker" type="button">
+            <span aria-hidden="true">▦</span>
+            <span id="month-name"></span>
+            <span class="chevron" aria-hidden="true">⌄</span>
+          </button>
+        </section>
+
+        <section class="summary-card" id="overview-summary-card" aria-label="สรุปการเงินประจำเดือน">
+          <div class="summary-heading">
+            <span class="summary-icon" aria-hidden="true">✦</span>
+            <span>เงินคงเหลือสำหรับใช้</span>
+            <span class="summary-period" id="summary-period">เดือนนี้</span>
+          </div>
+          <p class="balance-amount" id="remaining-amount">฿0</p>
+          <div class="balance-progress" aria-hidden="true">
+            <span id="balance-progress"></span>
+          </div>
+          <div class="balance-caption">
+            <span>ใช้งบไป <strong id="spent-amount">฿0</strong></span>
+            <span>จาก <strong id="income-amount">฿0</strong></span>
+          </div>
+          <div class="summary-divider"></div>
+          <div class="income-expense">
+            <div class="mini-stat">
+              <span class="stat-icon income-icon" aria-hidden="true">↙</span>
+              <span class="stat-label">รายรับ</span>
+              <strong id="income-stat">฿0</strong>
+            </div>
+            <div class="mini-stat">
+              <span class="stat-icon expense-icon" aria-hidden="true">↗</span>
+              <span class="stat-label">รายจ่าย</span>
+              <strong id="expense-stat">฿0</strong>
+            </div>
+          </div>
+        </section>
+
+        <section class="section-block budget-section" id="budget-section" aria-labelledby="budget-title">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">คุมค่าใช้จ่ายให้อยู่หมัด</p>
+              <h2 id="budget-title">งบประมาณของฉัน</h2>
+            </div>
+            <button class="text-button" type="button" id="all-budgets">
+              ดูทั้งหมด <span aria-hidden="true">→</span>
+            </button>
+          </div>
+          <div class="budget-list" id="budget-list"></div>
+        </section>
+
+        <section class="summary-page" id="summary-page" aria-labelledby="summary-page-title" hidden>
+          <div class="section-heading summary-page-heading">
+            <div>
+              <p class="eyebrow">ภาพรวมรายรับและรายจ่าย</p>
+              <h2 id="summary-page-title">สรุปประจำเดือน</h2>
+            </div>
+          </div>
+          <div class="summary-metrics">
+            <article class="summary-metric income-metric">
+              <span>รายรับทั้งหมด</span>
+              <strong id="summary-income-total">฿0</strong>
+            </article>
+            <article class="summary-metric expense-metric">
+              <span>รายจ่ายทั้งหมด</span>
+              <strong id="summary-expense-total">฿0</strong>
+            </article>
+            <article class="summary-metric balance-metric">
+              <span>เงินคงเหลือ</span>
+              <strong id="summary-balance-total">฿0</strong>
+            </article>
+          </div>
+          <section class="summary-breakdown" aria-labelledby="expense-breakdown-title">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">ใช้จ่ายไปกับอะไรบ้าง</p>
+                <h2 id="expense-breakdown-title">รายจ่ายตามหมวดหมู่</h2>
+              </div>
+            </div>
+            <div class="breakdown-list" id="expense-breakdown"></div>
+            <p class="empty-state" id="expense-breakdown-empty" hidden>เดือนนี้ยังไม่มีรายจ่าย</p>
+          </section>
+          <section class="summary-breakdown" aria-labelledby="income-breakdown-title">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">รายรับมาจากไหนบ้าง</p>
+                <h2 id="income-breakdown-title">รายรับตามหมวดหมู่</h2>
+              </div>
+            </div>
+            <div class="breakdown-list" id="income-breakdown"></div>
+            <p class="empty-state" id="income-breakdown-empty" hidden>เดือนนี้ยังไม่มีรายรับ</p>
+          </section>
+          <p class="summary-transaction-count" id="summary-transaction-count"></p>
+        </section>
+
+        <section class="section-block activity-section" id="activity-section" aria-labelledby="activity-title">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow" id="activity-eyebrow">อัปเดตล่าสุด</p>
+              <h2 id="activity-title">รายการใช้จ่าย</h2>
+            </div>
+            <button class="text-button" id="all-transactions" type="button">
+              ดูทั้งหมด <span aria-hidden="true">→</span>
+            </button>
+          </div>
+          <div class="transaction-list" id="transaction-list"></div>
+          <p class="empty-state" id="empty-state" hidden>ยังไม่มีรายการในเดือนนี้ ลองเพิ่มรายการแรกของคุณเลย</p>
+        </section>
+      </main>
+
+      <nav class="bottom-nav" aria-label="เมนูหลัก">
+        <button class="nav-item active" id="nav-overview" type="button" aria-current="page">
+          <span aria-hidden="true">⌂</span><span>ภาพรวม</span>
+        </button>
+        <button class="nav-item" id="nav-transactions" type="button">
+          <span aria-hidden="true">☷</span><span>รายการ</span>
+        </button>
+        <button class="nav-add" id="open-expense" type="button" aria-label="เพิ่มรายจ่าย">
+          <span aria-hidden="true">+</span>
+        </button>
+        <button class="nav-item" id="nav-budgets" type="button">
+          <span aria-hidden="true">▤</span><span>งบประมาณ</span>
+        </button>
+        <button class="nav-item" id="nav-summary" type="button">
+          <span aria-hidden="true">◷</span><span>สรุป</span>
+        </button>
+      </nav>
+    </div>
+
+    <dialog class="expense-dialog entry-type-dialog" id="entry-type-dialog" aria-labelledby="entry-type-title">
+      <div class="dialog-grabber" aria-hidden="true"></div>
+      <div class="dialog-heading">
+        <div>
+          <p class="eyebrow">เริ่มบันทึกรายการใหม่</p>
+          <h2 id="entry-type-title">ต้องการเพิ่มอะไร?</h2>
+        </div>
+        <button class="close-button" id="close-entry-type" type="button" aria-label="ปิด">×</button>
+      </div>
+      <div class="entry-type-options">
+        <button class="entry-type-choice income-choice" id="add-income" type="button">
+          <span class="entry-type-icon" aria-hidden="true">↙</span>
+          <span><strong>รายรับ</strong><small>เงินเดือน งานเสริม และรายรับอื่น ๆ</small></span>
+          <span class="entry-type-arrow" aria-hidden="true">→</span>
+        </button>
+        <button class="entry-type-choice expense-choice" id="add-expense" type="button">
+          <span class="entry-type-icon" aria-hidden="true">↗</span>
+          <span><strong>รายจ่าย</strong><small>บันทึกค่าใช้จ่ายประจำวัน</small></span>
+          <span class="entry-type-arrow" aria-hidden="true">→</span>
+        </button>
+      </div>
+    </dialog>
+    <dialog class="expense-dialog" id="expense-dialog" aria-labelledby="dialog-title">
+      <form id="expense-form">
+        <div class="dialog-grabber" aria-hidden="true"></div>
+        <div class="dialog-heading">
+          <div>
+            <p class="eyebrow">บันทึกให้เรียบร้อย</p>
+            <h2 id="dialog-title">เพิ่มรายจ่าย</h2>
+          </div>
+          <button class="close-button" id="close-dialog" type="button" aria-label="ปิด">×</button>
+        </div>
+
+        <fieldset class="type-toggle" id="type-toggle">
+          <legend class="sr-only">ประเภทรายการ</legend>
+          <label class="type-option selected" id="expense-option">
+            <input type="radio" name="type" value="expense" checked />
+            <span>รายจ่าย</span>
+          </label>
+          <label class="type-option" id="income-option">
+            <input type="radio" name="type" value="income" />
+            <span>รายรับ</span>
+          </label>
+        </fieldset>
+
+        <label class="field-label" for="amount">จำนวนเงิน</label>
+        <div class="amount-field">
+          <span aria-hidden="true">฿</span>
+          <input
+            id="amount"
+            name="amount"
+            type="number"
+            min="0.01"
+            step="0.01"
+            inputmode="decimal"
+            placeholder="0.00"
+            required
+          />
+          <span class="currency-label">บาท</span>
+        </div>
+
+        <div id="category-field">
+          <label class="field-label" for="category">หมวดหมู่</label>
+          <select id="category" name="category" required></select>
+        </div>
+
+        <label class="field-label" for="date">วันที่</label>
+        <input id="date" name="date" type="date" required />
+
+        <label class="field-label" for="note">บันทึกเพิ่มเติม <span>(ไม่บังคับ)</span></label>
+        <input id="note" name="note" type="text" maxlength="80" placeholder="เช่น กาแฟก่อนทำงาน" />
+
+        <p class="form-error" id="form-error" role="alert" hidden></p>
+        <button class="submit-button" type="submit">บันทึกรายการ <span aria-hidden="true">→</span></button>
+      </form>
+    </dialog>
+    <dialog class="expense-dialog month-dialog" id="month-dialog" aria-labelledby="month-dialog-title">
+      <form id="month-form">
+        <div class="dialog-grabber" aria-hidden="true"></div>
+        <div class="dialog-heading">
+          <div>
+            <p class="eyebrow">เลือกช่วงเวลาที่ต้องการดู</p>
+            <h2 id="month-dialog-title">เลือกเดือน</h2>
+          </div>
+          <button class="close-button" id="close-month-dialog" type="button" aria-label="ปิด">×</button>
+        </div>
+        <div class="month-year-picker" aria-label="เลือกปี">
+          <button class="year-step" id="previous-year" type="button" aria-label="ปีก่อน">‹</button>
+          <strong id="picker-year" aria-live="polite"></strong>
+          <button class="year-step" id="next-year" type="button" aria-label="ปีถัดไป">›</button>
+        </div>
+        <div class="month-grid" id="month-grid" role="group" aria-label="เลือกเดือน"></div>
+        <button class="submit-button" type="submit">แสดงข้อมูลเดือนนี้ <span aria-hidden="true">→</span></button>
+      </form>
+    </dialog>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  </body>
+</html>
