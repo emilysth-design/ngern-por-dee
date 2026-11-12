@@ -496,10 +496,30 @@ h2 {
 
 .budget-card {
   min-width: 0;
+  width: 100%;
   padding: 12px 12px 11px;
   border: 1px solid #eff0e9;
   border-radius: 14px;
   background: #fff;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 140ms ease, box-shadow 140ms ease, transform 140ms ease;
+}
+
+.budget-card:hover {
+  border-color: #d7e6d9;
+  box-shadow: 0 4px 12px rgb(34 87 57 / 7%);
+}
+
+.budget-card:active {
+  transform: scale(0.98);
+}
+
+.budget-card:focus-visible {
+  outline: 2px solid #75a888;
+  outline-offset: 2px;
 }
 
 .budget-topline {
@@ -593,6 +613,13 @@ h2 {
   background: #db776e;
 }
 
+.budget-category-total {
+  margin: -5px 0 12px;
+  color: var(--green);
+  font-size: 13px;
+  font-weight: 600;
+}
+
 .activity-section {
   margin-top: 28px;
 }
@@ -678,9 +705,10 @@ h2 {
   left: 0;
   width: min(100%, 520px);
   min-height: 76px;
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   align-items: center;
-  justify-content: space-around;
+  justify-items: center;
   margin: 0 auto;
   padding: 8px 14px max(10px, env(safe-area-inset-bottom));
   border-top: 1px solid #ecefe8;
@@ -1133,7 +1161,7 @@ h2 {
   outline: 0;
   background: #fff;
   color: var(--ink);
-  font-size: 11px;
+  font-size: 16px;
 }
 
 .expense-dialog select:focus,

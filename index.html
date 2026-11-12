@@ -168,6 +168,20 @@
       </nav>
     </div>
 
+    <dialog class="expense-dialog" id="budget-category-dialog" aria-labelledby="budget-category-title">
+      <div class="dialog-grabber" aria-hidden="true"></div>
+      <div class="dialog-heading">
+        <div>
+          <p class="eyebrow" id="budget-category-month"></p>
+          <h2 id="budget-category-title"></h2>
+        </div>
+        <button class="close-button" id="close-budget-category" type="button" aria-label="ปิด">×</button>
+      </div>
+      <p class="budget-category-total" id="budget-category-total"></p>
+      <div class="transaction-list" id="budget-category-list"></div>
+      <p class="empty-state" id="budget-category-empty" hidden>เดือนนี้ยังไม่มีรายการในหมวดหมู่นี้</p>
+    </dialog>
+
     <dialog class="expense-dialog entry-type-dialog" id="entry-type-dialog" aria-labelledby="entry-type-title">
       <div class="dialog-grabber" aria-hidden="true"></div>
       <div class="dialog-heading">

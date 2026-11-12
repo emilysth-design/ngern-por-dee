@@ -178,7 +178,7 @@ function renderBudgets(transactions) {
       const percentage = (spent / category.budget) * 100;
       const status = percentage >= 100 ? "over" : percentage >= 75 ? "warning" : "";
       return `
-        <article class="budget-card">
+        <button class="budget-card" type="button" data-budget-category="${category.id}" aria-label="ดูรายการ${category.name}">
           <div class="budget-topline">
             <span class="category-icon tone-${category.tone}" aria-hidden="true">${category.icon}</span>
             <span class="budget-name">${category.name}</span>
@@ -190,9 +190,45 @@ function renderBudgets(transactions) {
           <div class="budget-track" role="progressbar" aria-label="งบ${category.name}" aria-valuenow="${Math.round(percentage)}" aria-valuemin="0" aria-valuemax="100">
             <span class="${status}" style="width: ${Math.min(percentage, 100)}%"></span>
           </div>
+        </button>`;
+    })
+    .join("");
+}
+
+function showBudgetCategory(categoryId) {
+  const category = categories.find((item) => item.id === categoryId);
+  if (!category) {
+    console.error("ไม่พบหมวดหมู่งบประมาณ");
+    showToast("ไม่พบหมวดหมู่นี้");
+    return;
+  }
+
+  const transactions = currentMonthTransactions()
+    .filter((transaction) => transaction.category === category.id)
+    .sort((a, b) => b.date.localeCompare(a.date) || b.id.localeCompare(a.id));
+  const expenses = sumTransactions(transactions, "expense");
+  const income = sumTransactions(transactions, "income");
+  byId("budget-category-title").textContent = `${category.icon} ${category.name}`;
+  byId("budget-category-month").textContent = byId("month-name").textContent;
+  byId("budget-category-total").textContent = `รายจ่าย ฿${formatMoney(expenses)} · รายรับ ฿${formatMoney(income)}`;
+  byId("budget-category-list").innerHTML = transactions
+    .map((transaction) => {
+      const isIncome = transaction.type === "income";
+      const title = transaction.note || category.name;
+      return `
+        <article class="transaction-row">
+          <span class="category-icon tone-${category.tone}" aria-hidden="true">${category.icon}</span>
+          <div class="transaction-copy">
+            <p class="transaction-title">${escapeHTML(title)}</p>
+            <p class="transaction-meta">${isIncome ? "รายรับ" : "รายจ่าย"} · ${formatDate(transaction.date)}</p>
+          </div>
+          <span class="transaction-amount ${isIncome ? "income" : ""}">${isIncome ? "+" : "−"}฿${formatMoney(transaction.amount)}</span>
         </article>`;
     })
     .join("");
+  byId("budget-category-empty").hidden = transactions.length > 0;
+  byId("budget-category-list").hidden = transactions.length === 0;
+  byId("budget-category-dialog").showModal();
 }
 
 function renderBreakdown(transactions, listId, emptyId, transactionType, categoryList, total) {
@@ -294,16 +330,17 @@ function render() {
   renderTransactions(transactions);
   const historyView = currentView === "history";
   const summaryView = currentView === "summary";
-  byId("overview-summary-card").hidden = summaryView;
+  const budgetsView = currentView === "budgets";
+  byId("overview-summary-card").hidden = summaryView || budgetsView;
   byId("budget-section").hidden = historyView || summaryView;
   byId("summary-page").hidden = !summaryView;
-  byId("activity-section").hidden = summaryView;
-  byId("month-label").textContent = summaryView ? "สรุปการเงินประจำเดือน" : "ภาพรวมประจำเดือน";
-  byId("welcome-title").textContent = historyView ? "ประวัติรายการ" : summaryView ? "สรุปการเงิน" : "สวัสดี, วันนี้เป็นไงบ้าง?";
+  byId("activity-section").hidden = summaryView || budgetsView;
+  byId("month-label").textContent = summaryView ? "สรุปการเงินประจำเดือน" : budgetsView ? "จัดการงบประมาณรายเดือน" : "ภาพรวมประจำเดือน";
+  byId("welcome-title").textContent = historyView ? "ประวัติรายการ" : summaryView ? "สรุปการเงิน" : budgetsView ? "งบประมาณของฉัน" : "สวัสดี, วันนี้เป็นไงบ้าง?";
   byId("activity-title").textContent = historyView ? "รายการทั้งหมด" : "รายการใช้จ่าย";
   byId("activity-eyebrow").textContent = historyView ? `รายการทั้งหมดใน${byId("month-name").textContent}` : "อัปเดตล่าสุด";
   document.querySelectorAll(".nav-item").forEach((item) => {
-    const active = item.id === (historyView ? "nav-transactions" : summaryView ? "nav-summary" : "nav-overview");
+    const active = item.id === (historyView ? "nav-transactions" : summaryView ? "nav-summary" : budgetsView ? "nav-budgets" : "nav-overview");
     item.classList.toggle("active", active);
     if (active) item.setAttribute("aria-current", "page");
     else item.removeAttribute("aria-current");
@@ -589,13 +626,21 @@ byId("all-transactions").addEventListener("click", () => {
   }
 });
 function showBudgets() {
-  currentView = "overview";
+  currentView = "budgets";
   render();
-  byId("budget-title").scrollIntoView({ behavior: "smooth", block: "center" });
+  window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 byId("nav-budgets").addEventListener("click", showBudgets);
 byId("all-budgets").addEventListener("click", showBudgets);
+byId("budget-list").addEventListener("click", (event) => {
+  const button = event.target.closest("[data-budget-category]");
+  if (button) showBudgetCategory(button.dataset.budgetCategory);
+});
+byId("close-budget-category").addEventListener("click", () => byId("budget-category-dialog").close());
+byId("budget-category-dialog").addEventListener("click", (event) => {
+  if (event.target === byId("budget-category-dialog")) byId("budget-category-dialog").close();
+});
 byId("nav-summary").addEventListener("click", () => {
   currentView = "summary";
   render();
