@@ -1,4 +1,6 @@
 const STORAGE_KEY = "ngern-por-dee-v1";
+const PROFILE_STORAGE_KEY = "ngern-por-dee-profile-v1";
+const DEFAULT_PROFILE = { name: "ผู้ใช้", avatar: "" };
 
 const categories = [
   { id: "food", name: "อาหาร", icon: "🍜", tone: "orange", budget: 6000 },
@@ -93,6 +95,56 @@ function sumTransactions(transactions, type) {
     .reduce((sum, transaction) => sum + transaction.amount, 0);
 }
 
+function getFinancialStatus(balance) {
+  if (balance >= 15000) return "มหาเศรษฐี";
+  if (balance >= 10000) return "คนธรรมดา";
+  if (balance >= 8000) return "คนเริ่มจะจน";
+  if (balance >= 5000) return "คนจนที่มีตังนิดนึง";
+  if (balance >= 3000) return "คนจนจริงไม่โม้";
+  if (balance >= 1000) return "คนนี้จะอยู่ไหวไหมนะ";
+  return "คนขอทาน";
+}
+
+function loadProfile() {
+  try {
+    const saved = localStorage.getItem(PROFILE_STORAGE_KEY);
+    if (!saved) return { ...DEFAULT_PROFILE };
+    const parsed = JSON.parse(saved);
+    return {
+      name: typeof parsed.name === "string" && parsed.name.trim() ? parsed.name.trim().slice(0, 32) : DEFAULT_PROFILE.name,
+      avatar: typeof parsed.avatar === "string" && parsed.avatar.startsWith("data:image/") ? parsed.avatar : "",
+    };
+  } catch (error) {
+    console.error("ไม่สามารถโหลดโปรไฟล์ได้", error);
+    return { ...DEFAULT_PROFILE };
+  }
+}
+
+let profile = loadProfile();
+let pendingAvatar = profile.avatar;
+
+function initialsFor(name) {
+  return Array.from(name.trim())[0] || "ผ";
+}
+
+function renderProfile(balance) {
+  const status = getFinancialStatus(balance);
+  const initial = initialsFor(profile.name);
+  const avatarImage = byId("avatar-image");
+  const previewImage = byId("profile-preview-image");
+  byId("avatar-initial").textContent = initial;
+  byId("profile-preview-initial").textContent = initial;
+  byId("open-profile").setAttribute("aria-label", `แก้ไขโปรไฟล์ ${profile.name}`);
+  for (const image of [avatarImage, previewImage]) {
+    image.hidden = !profile.avatar;
+    if (profile.avatar) image.src = profile.avatar;
+    else image.removeAttribute("src");
+  }
+  byId("profile-status").textContent = status;
+  byId("profile-dialog-status").textContent = status;
+  byId("profile-dialog-balance").textContent = `฿${formatMoney(balance)}`;
+}
+
 function renderSummary(transactions) {
   const income = sumTransactions(transactions, "income");
   const expenses = sumTransactions(transactions, "expense");
@@ -114,6 +166,7 @@ function renderSummary(transactions) {
   byId("expense-stat").textContent = `฿${formatMoney(expenses)}`;
   byId("balance-progress").style.width = `${spentPercentage}%`;
   byId("remaining-amount").classList.toggle("negative-balance", remaining < 0);
+  renderProfile(remaining);
 }
 
 function renderBudgets(transactions) {
@@ -273,6 +326,108 @@ function showToast(message) {
   window.clearTimeout(toastTimer);
   toastTimer = window.setTimeout(() => toast.classList.remove("visible"), 2500);
 }
+
+function openProfileDialog() {
+  byId("profile-name").value = profile.name;
+  byId("profile-error").hidden = true;
+  byId("profile-photo").value = "";
+  pendingAvatar = profile.avatar;
+  updateProfilePhotoPreview();
+  byId("profile-dialog").showModal();
+}
+
+function updateProfilePhotoPreview() {
+  const image = byId("profile-preview-image");
+  image.hidden = !pendingAvatar;
+  if (pendingAvatar) image.src = pendingAvatar;
+  else image.removeAttribute("src");
+  byId("profile-preview-initial").textContent = initialsFor(byId("profile-name").value || DEFAULT_PROFILE.name);
+  byId("remove-profile-photo").hidden = !pendingAvatar;
+}
+
+async function resizeProfilePhoto(file) {
+  const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
+  if (!allowedTypes.includes(file.type)) {
+    throw new Error("เลือกรูปภาพชนิด PNG, JPG หรือ WebP");
+  }
+  if (file.size > 10 * 1024 * 1024) {
+    throw new Error("ไฟล์รูปภาพต้องมีขนาดไม่เกิน 10 MB");
+  }
+
+  const imageUrl = URL.createObjectURL(file);
+  try {
+    const image = new Image();
+    image.src = imageUrl;
+    await image.decode();
+    const size = 256;
+    const cropSize = Math.min(image.naturalWidth, image.naturalHeight);
+    const sourceX = (image.naturalWidth - cropSize) / 2;
+    const sourceY = (image.naturalHeight - cropSize) / 2;
+    const canvas = document.createElement("canvas");
+    canvas.width = size;
+    canvas.height = size;
+    const context = canvas.getContext("2d");
+    if (!context) throw new Error("ไม่สามารถประมวลผลรูปภาพได้");
+    context.drawImage(image, sourceX, sourceY, cropSize, cropSize, 0, 0, size, size);
+    return canvas.toDataURL("image/jpeg", 0.82);
+  } catch {
+    throw new Error("อ่านไฟล์รูปภาพไม่ได้ กรุณาลองเลือกรูปอื่น");
+  } finally {
+    URL.revokeObjectURL(imageUrl);
+  }
+}
+
+byId("open-profile").addEventListener("click", openProfileDialog);
+byId("close-profile-dialog").addEventListener("click", () => byId("profile-dialog").close());
+byId("profile-dialog").addEventListener("click", (event) => {
+  if (event.target === byId("profile-dialog")) byId("profile-dialog").close();
+});
+byId("profile-name").addEventListener("input", updateProfilePhotoPreview);
+byId("profile-photo").addEventListener("change", async (event) => {
+  const file = event.target.files?.[0];
+  if (!file) return;
+  const error = byId("profile-error");
+  error.hidden = true;
+  try {
+    pendingAvatar = await resizeProfilePhoto(file);
+    updateProfilePhotoPreview();
+  } catch (cause) {
+    error.textContent = cause.message;
+    error.hidden = false;
+    event.target.value = "";
+  }
+});
+byId("remove-profile-photo").addEventListener("click", () => {
+  pendingAvatar = "";
+  byId("profile-photo").value = "";
+  updateProfilePhotoPreview();
+});
+byId("profile-form").addEventListener("submit", (event) => {
+  event.preventDefault();
+  const name = byId("profile-name").value.trim();
+  const error = byId("profile-error");
+  if (!name) {
+    error.textContent = "กรุณากรอกชื่อที่ต้องการแสดง";
+    error.hidden = false;
+    byId("profile-name").focus();
+    return;
+  }
+
+  const previousProfile = profile;
+  profile = { name, avatar: pendingAvatar };
+  try {
+    localStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify(profile));
+  } catch (cause) {
+    profile = previousProfile;
+    error.textContent = "บันทึกโปรไฟล์ไม่สำเร็จ พื้นที่จัดเก็บในอุปกรณ์อาจไม่เพียงพอ";
+    error.hidden = false;
+    console.error("ไม่สามารถบันทึกโปรไฟล์ได้", cause);
+    return;
+  }
+  renderProfile(sumTransactions(currentMonthTransactions(), "income") - sumTransactions(currentMonthTransactions(), "expense"));
+  byId("profile-dialog").close();
+  showToast("บันทึกโปรไฟล์แล้ว");
+});
 
 function renderMonthPicker() {
   byId("picker-year").textContent = String(pickerYear);

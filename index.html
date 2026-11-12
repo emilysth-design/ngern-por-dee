@@ -25,7 +25,10 @@
           <span class="brand-mark" aria-hidden="true">฿</span>
           <span>เงิน<span class="brand-accent">พอดี</span></span>
         </a>
-        <button class="avatar" type="button" aria-label="โปรไฟล์">ม</button>
+        <button class="avatar" id="open-profile" type="button" aria-label="แก้ไขโปรไฟล์">
+          <img id="avatar-image" alt="" hidden />
+          <span id="avatar-initial">ผ</span>
+        </button>
       </header>
 
       <main>
@@ -48,6 +51,10 @@
             <span class="summary-period" id="summary-period">เดือนนี้</span>
           </div>
           <p class="balance-amount" id="remaining-amount">฿0</p>
+          <div class="profile-status-line">
+            <span>สถานะการเงิน</span>
+            <strong id="profile-status">คนขอทาน</strong>
+          </div>
           <div class="balance-progress" aria-hidden="true">
             <span id="balance-progress"></span>
           </div>
@@ -254,6 +261,41 @@
         </div>
         <div class="month-grid" id="month-grid" role="group" aria-label="เลือกเดือน"></div>
         <button class="submit-button" type="submit">แสดงข้อมูลเดือนนี้ <span aria-hidden="true">→</span></button>
+      </form>
+    </dialog>
+    <dialog class="expense-dialog profile-dialog" id="profile-dialog" aria-labelledby="profile-dialog-title">
+      <form id="profile-form">
+        <div class="dialog-grabber" aria-hidden="true"></div>
+        <div class="dialog-heading">
+          <div>
+            <p class="eyebrow">ปรับแต่งตามสไตล์คุณ</p>
+            <h2 id="profile-dialog-title">โปรไฟล์ของฉัน</h2>
+          </div>
+          <button class="close-button" id="close-profile-dialog" type="button" aria-label="ปิด">×</button>
+        </div>
+        <div class="profile-photo-editor">
+          <div class="profile-photo-preview" aria-hidden="true">
+            <img id="profile-preview-image" alt="" hidden />
+            <span id="profile-preview-initial">ผ</span>
+          </div>
+          <div class="profile-photo-actions">
+            <label class="photo-upload-button" for="profile-photo">เลือกรูปภาพ</label>
+            <input id="profile-photo" name="photo" type="file" accept="image/png,image/jpeg,image/webp" />
+            <button class="photo-remove-button" id="remove-profile-photo" type="button" hidden>ลบรูป</button>
+            <span class="photo-hint">PNG, JPG หรือ WebP · ไม่เกิน 10 MB</span>
+          </div>
+        </div>
+        <label class="field-label" for="profile-name">ชื่อที่แสดง</label>
+        <input id="profile-name" name="name" type="text" maxlength="32" autocomplete="nickname" required />
+        <div class="profile-status-card" aria-live="polite">
+          <span class="profile-status-label">สถานะจากยอดคงเหลือเดือนนี้</span>
+          <strong id="profile-dialog-status">คนขอทาน</strong>
+          <span class="profile-status-balance" id="profile-dialog-balance">฿0</span>
+          <small>สถานะคำนวณอัตโนมัติจากรายรับหักรายจ่าย</small>
+        </div>
+        <p class="form-error" id="profile-error" role="alert" hidden></p>
+        <button class="submit-button" type="submit">บันทึกโปรไฟล์ <span aria-hidden="true">→</span></button>
+        <p class="profile-storage-note">รูปและชื่อบันทึกไว้ในเบราว์เซอร์เครื่องนี้เท่านั้น</p>
       </form>
     </dialog>
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
