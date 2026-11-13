@@ -274,11 +274,31 @@ function renderSummaryPage(transactions) {
   const expenses = sumTransactions(transactions, "expense");
   const balance = income - expenses;
   const transactionCount = transactions.length;
+  const maxAmount = Math.max(income, expenses);
 
+  byId("summary-report-month").textContent = byId("month-name").textContent;
   byId("summary-income-total").textContent = `฿${formatMoney(income)}`;
   byId("summary-expense-total").textContent = `฿${formatMoney(expenses)}`;
   byId("summary-balance-total").textContent = `฿${formatMoney(balance)}`;
   byId("summary-balance-total").classList.toggle("negative-balance", balance < 0);
+  byId("monthly-chart-list").innerHTML = [
+    { label: "รายรับ", amount: income, type: "income" },
+    { label: "รายจ่าย", amount: expenses, type: "expense" },
+  ]
+    .map(({ label, amount, type }) => {
+      const percentage = maxAmount > 0 ? (amount / maxAmount) * 100 : 0;
+      return `
+        <div class="monthly-chart-row">
+          <div class="monthly-chart-label">
+            <span>${label}</span>
+            <strong>฿${formatMoney(amount)}</strong>
+          </div>
+          <div class="monthly-chart-track" role="progressbar" aria-label="${label} ฿${formatMoney(amount)}" aria-valuenow="${Math.round(percentage)}" aria-valuemin="0" aria-valuemax="100">
+            <span class="${type}" style="width: ${percentage}%"></span>
+          </div>
+        </div>`;
+    })
+    .join("");
   renderBreakdown(transactions, "expense-breakdown", "expense-breakdown-empty", "expense", categories, expenses);
   renderBreakdown(transactions, "income-breakdown", "income-breakdown-empty", "income", incomeCategories, income);
   byId("summary-transaction-count").textContent = `${formatMoney(transactionCount)} รายการใน${byId("month-name").textContent}`;
@@ -646,6 +666,7 @@ byId("nav-summary").addEventListener("click", () => {
   render();
   window.scrollTo({ top: 0, behavior: "smooth" });
 });
+byId("print-summary").addEventListener("click", () => window.print());
 byId("month-picker").addEventListener("click", () => {
   [pickerYear, pickerMonth] = selectedMonth.split("-").map(Number);
   renderMonthPicker();

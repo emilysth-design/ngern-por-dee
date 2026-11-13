@@ -94,8 +94,11 @@
           <div class="section-heading summary-page-heading">
             <div>
               <p class="eyebrow">ภาพรวมรายรับและรายจ่าย</p>
-              <h2 id="summary-page-title">สรุปประจำเดือน</h2>
+              <h2 id="summary-page-title">รายงานประจำเดือน <span id="summary-report-month"></span></h2>
             </div>
+            <button class="print-button" id="print-summary" type="button">
+              <span aria-hidden="true">▤</span> พิมพ์รายงาน
+            </button>
           </div>
           <div class="summary-metrics">
             <article class="summary-metric income-metric">
@@ -111,26 +114,37 @@
               <strong id="summary-balance-total">฿0</strong>
             </article>
           </div>
-          <section class="summary-breakdown" aria-labelledby="expense-breakdown-title">
+          <section class="monthly-chart" aria-labelledby="monthly-chart-title">
             <div class="section-heading">
               <div>
-                <p class="eyebrow">ใช้จ่ายไปกับอะไรบ้าง</p>
-                <h2 id="expense-breakdown-title">รายจ่ายตามหมวดหมู่</h2>
+                <p class="eyebrow">เปรียบเทียบยอดรวม</p>
+                <h2 id="monthly-chart-title">แผนภูมิรายรับ-รายจ่าย</h2>
               </div>
             </div>
-            <div class="breakdown-list" id="expense-breakdown"></div>
-            <p class="empty-state" id="expense-breakdown-empty" hidden>เดือนนี้ยังไม่มีรายจ่าย</p>
+            <div class="monthly-chart-list" id="monthly-chart-list"></div>
           </section>
-          <section class="summary-breakdown" aria-labelledby="income-breakdown-title">
-            <div class="section-heading">
-              <div>
-                <p class="eyebrow">รายรับมาจากไหนบ้าง</p>
-                <h2 id="income-breakdown-title">รายรับตามหมวดหมู่</h2>
+          <div class="summary-breakdowns">
+            <section class="summary-breakdown" aria-labelledby="expense-breakdown-title">
+              <div class="section-heading">
+                <div>
+                  <p class="eyebrow">ใช้จ่ายไปกับอะไรบ้าง</p>
+                  <h2 id="expense-breakdown-title">รายจ่ายตามหมวดหมู่</h2>
+                </div>
               </div>
-            </div>
-            <div class="breakdown-list" id="income-breakdown"></div>
-            <p class="empty-state" id="income-breakdown-empty" hidden>เดือนนี้ยังไม่มีรายรับ</p>
-          </section>
+              <div class="breakdown-list" id="expense-breakdown"></div>
+              <p class="empty-state" id="expense-breakdown-empty" hidden>เดือนนี้ยังไม่มีรายจ่าย</p>
+            </section>
+            <section class="summary-breakdown" aria-labelledby="income-breakdown-title">
+              <div class="section-heading">
+                <div>
+                  <p class="eyebrow">รายรับมาจากไหนบ้าง</p>
+                  <h2 id="income-breakdown-title">รายรับตามหมวดหมู่</h2>
+                </div>
+              </div>
+              <div class="breakdown-list" id="income-breakdown"></div>
+              <p class="empty-state" id="income-breakdown-empty" hidden>เดือนนี้ยังไม่มีรายรับ</p>
+            </section>
+          </div>
           <p class="summary-transaction-count" id="summary-transaction-count"></p>
         </section>
 
