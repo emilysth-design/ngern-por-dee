@@ -778,16 +778,16 @@ h2 {
 .bottom-nav {
   position: fixed;
   z-index: 4;
-  right: 0;
+  left: 50%;
   bottom: 0;
-  left: 0;
   width: min(100%, 520px);
   min-height: 76px;
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
   align-items: center;
   justify-items: center;
-  margin: 0 auto;
+  margin: 0;
+  transform: translateX(-50%);
   padding: 8px 14px max(10px, env(safe-area-inset-bottom));
   border-top: 1px solid #ecefe8;
   background: rgb(255 255 255 / 96%);
@@ -817,6 +817,8 @@ h2 {
 }
 
 .nav-add {
+  grid-column: 3;
+  justify-self: center;
   width: 46px;
   height: 46px;
   display: grid;
