@@ -833,9 +833,8 @@ h2 {
 
 .nav-add span {
   position: relative;
-  width: 20px;
-  height: 20px;
-  margin-top: -3px;
+  width: 16px;
+  height: 16px;
   font-size: 0;
 }
 
@@ -844,20 +843,20 @@ h2 {
   position: absolute;
   top: 50%;
   left: 50%;
-  border-radius: 2px;
+  border-radius: 1px;
   background: currentColor;
   content: "";
   transform: translate(-50%, -50%);
 }
 
 .nav-add span::before {
-  width: 20px;
-  height: 3px;
+  width: 16px;
+  height: 2px;
 }
 
 .nav-add span::after {
-  width: 3px;
-  height: 20px;
+  width: 2px;
+  height: 16px;
 }
 
 .expense-dialog {
