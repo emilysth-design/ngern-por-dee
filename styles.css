@@ -832,6 +832,9 @@ h2 {
 }
 
 .nav-add-icon {
+  display: block;
+  justify-self: center;
+  align-self: center;
   width: 22px;
   height: 22px;
   fill: currentColor;
