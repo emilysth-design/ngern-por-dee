@@ -832,11 +832,32 @@ h2 {
 }
 
 .nav-add span {
+  position: relative;
+  width: 20px;
+  height: 20px;
   margin-top: -3px;
-  font-family: "DM Sans", sans-serif;
-  font-size: 30px;
-  font-weight: 300;
-  line-height: 1;
+  font-size: 0;
+}
+
+.nav-add span::before,
+.nav-add span::after {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  border-radius: 2px;
+  background: currentColor;
+  content: "";
+  transform: translate(-50%, -50%);
+}
+
+.nav-add span::before {
+  width: 20px;
+  height: 3px;
+}
+
+.nav-add span::after {
+  width: 3px;
+  height: 20px;
 }
 
 .expense-dialog {
