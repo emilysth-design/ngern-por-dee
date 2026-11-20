@@ -831,32 +831,10 @@ h2 {
   box-shadow: 0 5px 12px rgb(39 116 80 / 22%);
 }
 
-.nav-add span {
-  position: relative;
-  width: 16px;
-  height: 16px;
-  font-size: 0;
-}
-
-.nav-add span::before,
-.nav-add span::after {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  border-radius: 1px;
-  background: currentColor;
-  content: "";
-  transform: translate(-50%, -50%);
-}
-
-.nav-add span::before {
-  width: 16px;
-  height: 2px;
-}
-
-.nav-add span::after {
-  width: 2px;
-  height: 16px;
+.nav-add-icon {
+  width: 22px;
+  height: 22px;
+  fill: currentColor;
 }
 
 .expense-dialog {
